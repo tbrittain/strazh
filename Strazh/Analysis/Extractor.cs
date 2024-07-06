@@ -13,14 +13,12 @@ namespace Strazh.Analysis
         private static TypeNode CreateTypeNode(this ISymbol symbol, TypeDeclarationSyntax declaration)
         {
             (string fullName, string name) = (symbol.ContainingNamespace.ToString() + '.' + symbol.Name, symbol.Name);
-            switch (declaration)
+            return declaration switch
             {
-                case ClassDeclarationSyntax _:
-                    return new ClassNode(fullName, name, declaration.Modifiers.MapModifiers());
-                case InterfaceDeclarationSyntax _:
-                    return new InterfaceNode(fullName, name, declaration.Modifiers.MapModifiers());
-            }
-            return null;
+                ClassDeclarationSyntax _ => new ClassNode(fullName, name, declaration.Modifiers.MapModifiers()),
+                InterfaceDeclarationSyntax _ => new InterfaceNode(fullName, name, declaration.Modifiers.MapModifiers()),
+                _ => null
+            };
         }
 
         private static ClassNode CreateClassNode(this TypeInfo typeInfo)
@@ -34,17 +32,12 @@ namespace Strazh.Analysis
 
         private static TypeNode CreateTypeNode(this TypeInfo typeInfo)
         {
-            switch (typeInfo.ConvertedType.TypeKind)
+            return typeInfo.ConvertedType?.TypeKind switch // TODO: breakpoint when null
             {
-                case TypeKind.Interface:
-                    return CreateInterfaceNode(typeInfo);
-
-                case TypeKind.Class:
-                    return CreateClassNode(typeInfo);
-
-                default:
-                    return null;
-            }
+                TypeKind.Interface => CreateInterfaceNode(typeInfo),
+                TypeKind.Class => CreateClassNode(typeInfo),
+                _ => null
+            };
         }
 
         private static string GetName(this TypeInfo typeInfo)
@@ -152,19 +145,19 @@ namespace Strazh.Analysis
         /// </summary>
         public static void GetInherits(IList<Triple> triples, TypeDeclarationSyntax declaration, SemanticModel sem, TypeNode node)
         {
-            if (declaration.BaseList != null)
+            if (declaration.BaseList == null) return;
+
+            foreach (var baseTypeSyntax in declaration.BaseList.Types)
             {
-                foreach (var baseTypeSyntax in declaration.BaseList.Types)
+                var parentNode = sem.GetTypeInfo(baseTypeSyntax.Type).CreateTypeNode();
+                switch (node)
                 {
-                    var parentNode = sem.GetTypeInfo(baseTypeSyntax.Type).CreateTypeNode();
-                    if (node is ClassNode classNode)
-                    {
+                    case ClassNode classNode:
                         triples.Add(new TripleOfType(classNode, parentNode));
-                    }
-                    if (node is InterfaceNode interfaceNode && parentNode is InterfaceNode parentInterfaceNode)
-                    {
+                        break;
+                    case InterfaceNode interfaceNode when parentNode is InterfaceNode parentInterfaceNode:
                         triples.Add(new TripleOfType(interfaceNode, parentInterfaceNode));
-                    }
+                        break;
                 }
             }
         }
