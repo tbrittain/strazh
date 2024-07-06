@@ -7,12 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Buildalyzer" Version="3.1.0" />
-    <PackageReference Include="Buildalyzer.Workspaces" Version="3.1.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="3.8.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.0.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Csharp" Version="3.8.0" />
-    <PackageReference Include="Neo4j.Driver" Version="4.2.0" />
+    <PackageReference Include="Buildalyzer" Version="7.0.2" />
+    <PackageReference Include="Buildalyzer.Workspaces" Version="7.0.2" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.4.0" />
+    <PackageReference Include="Neo4j.Driver" Version="5.22.0" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20574.7" />
   </ItemGroup>
 
