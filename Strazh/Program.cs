@@ -6,10 +6,9 @@ using Strazh.Analysis;
 
 namespace Strazh
 {
-    public class Program
+    public static class Program
     {
-
-        public static async Task Main(params string[] args)
+        public async static Task Main(params string[] args)
         {
             var rootCommand = new RootCommand();
 
@@ -42,7 +41,7 @@ namespace Strazh
             await rootCommand.InvokeAsync(args);
         }
 
-        private static async Task BuildKnowledgeGraph(string credentials, string tier, string delete, string solution, string[] projects)
+        private async static Task BuildKnowledgeGraph(string credentials, string tier, string delete, string solution, string[] projects)
         {
             try
             {
@@ -58,8 +57,8 @@ namespace Strazh
                     Console.WriteLine("Please submit only one thing: `--solution` (-s) or `--projects` (-p)");
                     return;
                 }
-                var isNeo4jReady = await Healthcheck.IsNeo4jReady();
-                if (!isNeo4jReady)
+                var isNeo4JReady = await Healthcheck.IsNeo4jReady();
+                if (!isNeo4JReady)
                 {
                     Console.WriteLine("Strazh failed to start. There is no Neo4j instance ready to use.");
                     return;

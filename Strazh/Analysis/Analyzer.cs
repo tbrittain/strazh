@@ -15,7 +15,7 @@ namespace Strazh.Analysis
 {
     public static class Analyzer
     {
-        public static async Task Analyze(AnalyzerConfig config)
+        public async static Task Analyze(AnalyzerConfig config)
         {
             Console.WriteLine($"Setup analyzer...");
 

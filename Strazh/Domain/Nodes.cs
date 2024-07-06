@@ -44,7 +44,7 @@ namespace Strazh.Domain
 
         public string Modifiers { get; }
 
-        public override string Set(string node)
+        override public string Set(string node)
             => $"{base.Set(node)}{(string.IsNullOrEmpty(Modifiers) ? "" : $", {node}.modifiers = \"{Modifiers}\"")}";
     }
 
@@ -63,7 +63,7 @@ namespace Strazh.Domain
         {
         }
 
-        public override string Label { get; } = "Class";
+        override public string Label { get; } = "Class";
     }
 
     public class InterfaceNode : TypeNode
@@ -73,7 +73,7 @@ namespace Strazh.Domain
         {
         }
 
-        public override string Label { get; } = "Interface";
+        override public string Label { get; } = "Interface";
     }
 
     public class MethodNode : CodeNode
@@ -86,13 +86,13 @@ namespace Strazh.Domain
             SetPrimaryKey();
         }
 
-        public override string Label { get; } = "Method";
+        override public string Label { get; } = "Method";
 
         public string Arguments { get; }
 
         public string ReturnType { get; }
 
-        public override string Set(string node)
+        override public string Set(string node)
             => $"{base.Set(node)}, {node}.returnType = \"{ReturnType}\", {node}.arguments = \"{Arguments}\"";
 
         protected override void SetPrimaryKey()
@@ -108,7 +108,7 @@ namespace Strazh.Domain
         public FileNode(string fullName, string name)
             : base(fullName, name) { }
 
-        public override string Label { get; } = "File";
+        override public string Label { get; } = "File";
     }
 
     public class FolderNode : Node
@@ -116,7 +116,7 @@ namespace Strazh.Domain
         public FolderNode(string fullName, string name)
             : base(fullName, name) { }
 
-        public override string Label { get; } = "Folder";
+        override public string Label { get; } = "Folder";
     }
 
     public class ProjectNode : Node
@@ -127,7 +127,7 @@ namespace Strazh.Domain
         public ProjectNode(string fullName, string name)
             : base(fullName, name) { }
 
-        public override string Label { get; } = "Project";
+        override public string Label { get; } = "Project";
     }
 
     public class PackageNode : Node
@@ -139,11 +139,11 @@ namespace Strazh.Domain
             SetPrimaryKey();
         }
 
-        public override string Label { get; } = "Package";
+        override public string Label { get; } = "Package";
 
         public string Version { get; }
 
-        public override string Set(string node)
+        override public string Set(string node)
             => $"{base.Set(node)}, {node}.version = \"{Version}\"";
 
         protected override void SetPrimaryKey()

@@ -11,7 +11,7 @@ namespace Strazh.Database
     {
         private const string CONNECTION = "neo4j://localhost:7687";
 
-        public static async Task InsertData(IList<Triple> triples, CredentialsConfig credentials, bool isDelete)
+        public async static Task InsertData(IList<Triple> triples, CredentialsConfig credentials, bool isDelete)
         {
             if (credentials == null)
             {

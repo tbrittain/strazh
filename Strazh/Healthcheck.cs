@@ -8,7 +8,7 @@ namespace Strazh
 {
     public static class Healthcheck
     {
-        public static async Task<bool> IsNeo4jReady(short retry = 3)
+        public async static Task<bool> IsNeo4jReady(short retry = 3)
         {
             var statusCode = await GetStatusCode();
             if (statusCode == HttpStatusCode.OK)
@@ -25,7 +25,7 @@ namespace Strazh
             return false;
         }
 
-        private static async Task<HttpStatusCode> GetStatusCode()
+        private async static Task<HttpStatusCode> GetStatusCode()
         {
             try
             {
