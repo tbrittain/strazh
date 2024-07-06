@@ -15,7 +15,7 @@ namespace Strazh.Database
         {
             if (credentials == null)
             {
-                throw new ArgumentException($"Please, provide credentials.");
+                throw new ArgumentException($"Please provide Neo4j credentials.");
             }
             Console.WriteLine($"Code Knowledge Graph use \"{credentials.Database}\" Neo4j database.");
             var driver = GraphDatabase.Driver(CONNECTION, AuthTokens.Basic(credentials.User, credentials.Password));
@@ -42,7 +42,7 @@ namespace Strazh.Database
             finally
             {
                 await session.CloseAsync();
-                await driver.CloseAsync();
+                await driver.DisposeAsync();
             }
         }
     }
