@@ -29,7 +29,7 @@ namespace Strazh.Analysis
 
             Console.WriteLine($"Analyzer ready to analyze {projectAnalyzers.Count()} project/s.");
 
-            var workspace = new AdhocWorkspace();
+            using var workspace = new AdhocWorkspace();
             var projects = new List<(Project, IProjectAnalyzer)>();
 
             var sortedProjectAnalyzers = projectAnalyzers; // TODO sort
@@ -45,10 +45,9 @@ namespace Strazh.Analysis
                 triples = triples.GroupBy(x => x.ToString()).Select(x => x.First()).OrderBy(x => x.NodeA.Label).ToList();
                 await DbManager.InsertData(triples, config.Credentials, config.IsDelete && index == 0);
             }
-            workspace.Dispose();
         }
 
-        private static async Task<IList<Triple>> AnalyzeProject(int index, (Project project, IProjectAnalyzer projectAnalyzer) item, Tiers mode)
+        private async static Task<IList<Triple>> AnalyzeProject(int index, (Project project, IProjectAnalyzer projectAnalyzer) item, Tiers mode)
         {
             Console.WriteLine($"Project #{index}:");
             var root = GetRoot(item.project.FilePath);
@@ -57,10 +56,16 @@ namespace Strazh.Analysis
             Console.WriteLine($"Analyzing {projectName} project...");
 
             var triples = new List<Triple>();
-            if (mode == Tiers.All || mode == Tiers.Project)
+            if (mode is Tiers.All or Tiers.Project)
             {
                 Console.WriteLine($"Analyzing Project tier...");
                 var projectBuild = item.projectAnalyzer.Build().FirstOrDefault();
+                if (projectBuild == null)
+                {
+                    Console.WriteLine($"Build failed for project {projectName}. IAnalyzerResult is null.");
+                    return triples;
+                }
+
                 var projectNode = new ProjectNode(projectName);
                 triples.Add(new TripleIncludedIn(projectNode, rootNode));
                 projectBuild.ProjectReferences.ToList().ForEach(x =>
@@ -70,18 +75,23 @@ namespace Strazh.Analysis
                 });
                 projectBuild.PackageReferences.ToList().ForEach(x =>
                 {
-                    var version = x.Value.Values.FirstOrDefault(x => x.Contains(".")) ?? "none";
+                    var version = x.Value.Values.FirstOrDefault(y => y.Contains('.')) ?? "none";
                     var node = new PackageNode(x.Key, x.Key, version);
                     triples.Add(new TripleDependsOnPackage(projectNode, node));
                 });
                 Console.WriteLine($"Analyzing Project tier complete.");
             }
 
-            if (item.project.SupportsCompilation
-                && (mode == Tiers.All || mode == Tiers.Code))
+            if (item.project.SupportsCompilation && mode is Tiers.All or Tiers.Code)
             {
                 Console.WriteLine($"Analyzing Code tier...");
                 var compilation = await item.project.GetCompilationAsync();
+                if (compilation == null)
+                {
+                    Console.WriteLine($"Compilation failed for project {projectName}. Compilation is null.");
+                    return triples;
+                }
+
                 var syntaxTreeRoot = compilation.SyntaxTrees.Where(x => !x.FilePath.Contains("obj"));
                 foreach (var st in syntaxTreeRoot)
                 {
